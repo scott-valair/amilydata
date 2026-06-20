@@ -159,7 +159,11 @@ serviceButtons.forEach((button) => {
 
     detailTitle.textContent = content.title;
     detailCopy.textContent = content.copy;
-    detailList.innerHTML = content.items.map((item) => `<li>${item}</li>`).join("");
+    detailList.replaceChildren(...content.items.map((item) => {
+      const listItem = document.createElement("li");
+      listItem.textContent = item;
+      return listItem;
+    }));
   });
 });
 
