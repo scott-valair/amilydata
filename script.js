@@ -6,6 +6,7 @@ const nav = document.querySelector("[data-nav]");
 const navLinks = [...document.querySelectorAll(".primary-nav a")];
 const revealEls = [...document.querySelectorAll(".reveal")];
 const countEls = [...document.querySelectorAll("[data-count]")];
+const fitTextEls = [...document.querySelectorAll(".float-card strong, .metric-grid strong, .ring-label strong, .breakdown-list strong, .pipeline-step strong")];
 
 const serviceContent = {
   cleanup: {
@@ -96,10 +97,44 @@ function animateCount(el) {
     const progress = Math.min((now - start) / duration, 1);
     const eased = 1 - Math.pow(1 - progress, 3);
     el.textContent = formatter.format(Math.round(target * eased));
-    if (progress < 1) requestAnimationFrame(tick);
+    if (progress < 1) {
+      requestAnimationFrame(tick);
+    } else {
+      fitGraphicText();
+    }
   }
 
   requestAnimationFrame(tick);
+}
+
+function fitGraphicText() {
+  fitTextEls.forEach((el) => {
+    const box = el.closest(".metric-grid div, .ring-label, .breakdown-list li, .pipeline-step, .category-card li, .float-card");
+    if (!box) return;
+
+    el.style.fontSize = "";
+    const baseSize = parseFloat(getComputedStyle(el).fontSize);
+    let size = baseSize;
+    const minSize = Math.max(11, baseSize * 0.64);
+    let passes = 0;
+
+    while (el.scrollWidth > box.clientWidth - 2 && size > minSize && passes < 20) {
+      size -= 1;
+      el.style.fontSize = `${size}px`;
+      passes += 1;
+    }
+  });
+}
+
+requestAnimationFrame(fitGraphicText);
+
+if ("ResizeObserver" in window) {
+  const fitObserver = new ResizeObserver(() => requestAnimationFrame(fitGraphicText));
+  document.querySelectorAll(".float-card, .metric-grid div, .ring-label, .breakdown-list li, .pipeline-step, .category-card li").forEach((el) => {
+    fitObserver.observe(el);
+  });
+} else {
+  window.addEventListener("resize", fitGraphicText);
 }
 
 const serviceButtons = [...document.querySelectorAll("[data-service]")];
@@ -128,33 +163,144 @@ serviceButtons.forEach((button) => {
   });
 });
 
-const workTrack = document.querySelector("[data-work-track]");
-const workPrev = document.querySelector("[data-work-prev]");
-const workNext = document.querySelector("[data-work-next]");
-
-function scrollWork(direction) {
-  if (!workTrack) return;
-  const amount = Math.min(workTrack.clientWidth * 0.85, 420);
-  workTrack.scrollBy({ left: direction * amount, behavior: "smooth" });
+function randomLinePoints(width = 330, height = 120, points = 11) {
+  const insetX = width > 400 ? 24 : 8;
+  const xGap = (width - insetX * 2) / (points - 1);
+  return Array.from({ length: points }, (_, index) => {
+    const trend = height * 0.74 - index * ((height * 0.48) / (points - 1));
+    const wave = Math.sin(index * 1.35) * (height * 0.07);
+    const jitter = (Math.random() - 0.5) * (height * 0.16);
+    const y = Math.max(height * 0.14, Math.min(height * 0.82, trend + wave + jitter));
+    return `${Math.round(insetX + index * xGap)},${Math.round(y)}`;
+  }).join(" ");
 }
 
-workPrev?.addEventListener("click", () => scrollWork(-1));
-workNext?.addEventListener("click", () => scrollWork(1));
+function formatPercent(value) {
+  return `${value > 0 ? "+" : ""}${value}%`;
+}
 
-function randomLinePoints(width = 330, height = 120, points = 11) {
-  const xGap = width / (points - 1);
-  let last = height * 0.62;
-  return Array.from({ length: points }, (_, index) => {
-    const drift = (Math.random() - 0.48) * 36;
-    const trend = -index * 4.4;
-    last = Math.max(16, Math.min(height - 18, last + drift + trend / 8));
-    return `${Math.round(index * xGap)},${Math.round(last)}`;
-  }).join(" ");
+function setText(selector, value) {
+  document.querySelector(selector)?.replaceChildren(document.createTextNode(value));
+}
+
+function setMetric(key, value, delta) {
+  setText(`[data-sample-metric="${key}"]`, value);
+  setText(`[data-sample-delta="${key}"]`, formatPercent(delta));
+}
+
+function randomInt(min, max) {
+  return Math.round(min + Math.random() * (max - min));
+}
+
+const insightSets = [
+  [
+    { signal: "+22%", tone: "up", copy: "Attendance rises when reminders go out two days before a program." },
+    { signal: "3", tone: "hold", copy: "Three funders account for most restricted grant reporting." },
+    { signal: "-11%", tone: "down", copy: "Late intake forms dropped after simplifying required fields." }
+  ],
+  [
+    { signal: "+18%", tone: "up", copy: "Follow-up calls convert faster when client records are cleaned first." },
+    { signal: "4", tone: "hold", copy: "Four program categories drive most monthly dashboard questions." },
+    { signal: "-9%", tone: "down", copy: "Duplicate contact rows fell after standardizing intake labels." }
+  ],
+  [
+    { signal: "+26%", tone: "up", copy: "Donation response improves when outreach is grouped by audience." },
+    { signal: "2", tone: "hold", copy: "Two reports cover most board and grant update needs." },
+    { signal: "-14%", tone: "down", copy: "Manual spreadsheet checks dropped after validation rules were added." }
+  ]
+];
+
+function refreshDashboardData() {
+  const served = randomInt(1120, 1680);
+  const completed = randomInt(720, 980);
+  const satisfaction = randomInt(90, 98);
+  const funding = randomInt(27, 46);
+
+  setMetric("served", new Intl.NumberFormat("en-US").format(served), randomInt(9, 22));
+  setMetric("completed", new Intl.NumberFormat("en-US").format(completed), randomInt(6, 17));
+  setMetric("satisfaction", `${satisfaction}%`, randomInt(3, 8));
+  setMetric("funding", `$${funding}k`, randomInt(10, 24));
+
+  const programs = randomInt(54, 64);
+  const operations = randomInt(18, 25);
+  const fundraising = randomInt(9, 15);
+  const other = Math.max(4, 100 - programs - operations - fundraising);
+  const mission = programs + fundraising;
+  const mix = { programs, operations, fundraising, other };
+  const stops = [
+    programs,
+    programs + operations,
+    programs + operations + fundraising
+  ];
+
+  document.querySelector("[data-sample-ring]")?.style.setProperty(
+    "background",
+    `conic-gradient(var(--blue) 0 ${programs}%, #51b8d6 ${programs}% ${stops[1]}%, #56bd8f ${stops[1]}% ${stops[2]}%, #9cb4dc ${stops[2]}% 100%)`
+  );
+  document.querySelector('[data-sample-metric="mission"]')?.replaceChildren(
+    document.createTextNode(String(mission)),
+    Object.assign(document.createElement("span"), { textContent: "%" })
+  );
+
+  Object.entries(mix).forEach(([key, value]) => {
+    setText(`[data-breakdown-value="${key}"]`, `${value}%`);
+  });
+
+  document.querySelectorAll(".mix-bars i").forEach((bar, index) => {
+    const value = [programs, operations, fundraising, other][index];
+    bar.style.setProperty("--h", `${Math.max(8, value)}%`);
+  });
+
+  const requests = randomInt(38, 58);
+  const received = randomInt(Math.round(requests * 0.62), Math.round(requests * 0.78));
+  const draft = randomInt(Math.round(received * 0.45), Math.round(received * 0.64));
+  const review = randomInt(Math.max(6, Math.round(draft * 0.35)), Math.round(draft * 0.58));
+  const pipeline = { requests, received, draft, review };
+
+  Object.entries(pipeline).forEach(([key, value]) => {
+    setText(`[data-pipeline-value="${key}"]`, String(value));
+  });
+
+  document.querySelectorAll(".pipeline-step").forEach((step) => {
+    const value = Number(step.querySelector("[data-pipeline-value]")?.textContent || 0);
+    const width = Math.max(16, Math.round((value / requests) * 92));
+    step.querySelector(".stage-meter i")?.style.setProperty("--w", `${width}%`);
+  });
+
+  const insights = insightSets[randomInt(0, insightSets.length - 1)];
+  insights.forEach((item, index) => {
+    const signal = document.querySelector(`[data-insight-signal="${index}"]`);
+    const copy = document.querySelector(`[data-insight-copy="${index}"]`);
+    signal.textContent = item.signal;
+    signal.className = `signal ${item.tone}`;
+    copy.textContent = item.copy;
+  });
 }
 
 function refreshCharts() {
   document.querySelectorAll(".dynamic-line").forEach((line) => {
-    line.setAttribute("points", randomLinePoints());
+    const box = line.ownerSVGElement?.viewBox?.baseVal;
+    const width = box?.width || 330;
+    const height = box?.height || 120;
+    const points = randomLinePoints(width, height);
+    line.setAttribute("points", points);
+
+    const fill = line.ownerSVGElement?.querySelector(".chart-fill");
+    if (fill) {
+      const coords = points.split(" ");
+      const firstX = coords[0].split(",")[0];
+      const lastX = coords.at(-1).split(",")[0];
+      const baseline = Math.round(height - (height > 150 ? 24 : 12));
+      fill.setAttribute("points", `${points} ${lastX},${baseline} ${firstX},${baseline}`);
+    }
+
+    const coords = points.split(" ").map((point) => point.split(",").map(Number));
+    line.ownerSVGElement?.querySelectorAll(".chart-dots circle").forEach((dot, index) => {
+      const [x, y] = coords[[3, 7, 10][index] || coords.length - 1];
+      dot.setAttribute("cx", String(x));
+      dot.setAttribute("cy", String(y));
+    });
+
     line.style.animation = "none";
     void line.getBoundingClientRect();
     line.style.animation = "draw-line 1.2s ease forwards";
@@ -167,6 +313,9 @@ function refreshCharts() {
     void bar.getBoundingClientRect();
     bar.style.animation = "grow-bar 0.7s ease both";
   });
+
+  refreshDashboardData();
+  fitGraphicText();
 }
 
 document.querySelector("[data-refresh-charts]")?.addEventListener("click", refreshCharts);
