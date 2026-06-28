@@ -165,7 +165,16 @@ function positionServiceDetail(activeButton = document.querySelector(".service-c
   serviceButtons[rowEndIndex].after(detail);
 }
 
+function setServiceToggleState(activeButton = document.querySelector(".service-card.active")) {
+  serviceButtons.forEach((button) => {
+    const isActive = button === activeButton;
+    button.setAttribute("aria-expanded", String(isActive));
+    button.querySelector(".card-arrow")?.replaceChildren(document.createTextNode(isActive ? "−" : "+"));
+  });
+}
+
 positionServiceDetail();
+setServiceToggleState();
 
 serviceButtons.forEach((button) => {
   button.addEventListener("click", () => {
@@ -175,6 +184,8 @@ serviceButtons.forEach((button) => {
 
     serviceButtons.forEach((item) => item.classList.remove("active"));
     button.classList.add("active");
+    if (detail) detail.dataset.activeService = key;
+    setServiceToggleState(button);
     positionServiceDetail(button);
 
     detail?.animate([

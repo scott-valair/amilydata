@@ -703,6 +703,9 @@ em {
 }
 
 .service-card {
+  --service-accent: var(--blue);
+  --service-accent-soft: rgba(31, 102, 209, 0.14);
+  --service-surface: rgba(238, 245, 255, 0.9);
   display: flex;
   flex-direction: column;
   min-height: 238px;
@@ -712,6 +715,10 @@ em {
   color: var(--ink);
   position: relative;
   overflow: hidden;
+  background:
+    linear-gradient(135deg, rgba(255, 255, 255, 0.66), var(--service-surface)),
+    var(--service-surface);
+  border-color: color-mix(in srgb, var(--service-accent) 23%, white);
 }
 
 .service-card::before {
@@ -719,16 +726,40 @@ em {
   position: absolute;
   inset: auto -30% -60% -30%;
   height: 120px;
-  background: radial-gradient(circle, rgba(31,102,209,0.16), transparent 65%);
+  background: radial-gradient(circle, var(--service-accent-soft), transparent 65%);
   opacity: 0;
   transition: opacity 0.25s ease;
+}
+
+.service-card[data-service="cleanup"] {
+  --service-accent: #16a779;
+  --service-accent-soft: rgba(22, 167, 121, 0.2);
+  --service-surface: #edf9f4;
+}
+
+.service-card[data-service="dashboard"] {
+  --service-accent: #1f66d1;
+  --service-accent-soft: rgba(31, 102, 209, 0.18);
+  --service-surface: #edf5ff;
+}
+
+.service-card[data-service="reporting"] {
+  --service-accent: #6756e8;
+  --service-accent-soft: rgba(103, 86, 232, 0.18);
+  --service-surface: #f2efff;
+}
+
+.service-card[data-service="volunteer"] {
+  --service-accent: #f06f70;
+  --service-accent-soft: rgba(240, 111, 112, 0.18);
+  --service-surface: #fff1ee;
 }
 
 .service-card:hover,
 .service-card.active {
   transform: translateY(-6px);
   box-shadow: var(--shadow);
-  border-color: rgba(31, 102, 209, 0.28);
+  border-color: color-mix(in srgb, var(--service-accent) 42%, white);
 }
 
 .service-card:hover::before,
@@ -784,11 +815,11 @@ em {
   height: 38px;
   display: grid;
   place-items: center;
-  border: 1px solid #d8e8fb;
+  border: 1px solid color-mix(in srgb, var(--service-accent) 26%, white);
   border-radius: 50%;
-  background: #eef5ff;
-  color: var(--blue);
-  font-size: 1.2rem;
+  background: color-mix(in srgb, var(--service-accent) 10%, white);
+  color: var(--service-accent);
+  font-size: 1.45rem;
   line-height: 1;
   font-weight: 900;
   transition: transform 0.2s ease, background 0.2s ease, color 0.2s ease;
@@ -797,11 +828,13 @@ em {
 .service-card:hover .card-arrow,
 .service-card.active .card-arrow {
   transform: translateY(3px);
-  background: var(--blue);
+  background: var(--service-accent);
   color: white;
 }
 
 .service-detail {
+  --detail-accent: #16a779;
+  --detail-surface: #edf9f4;
   grid-column: 1 / -1;
   margin-top: 0;
   border-radius: 24px;
@@ -810,10 +843,34 @@ em {
   grid-template-columns: 1.3fr 1fr;
   gap: 28px;
   align-items: center;
+  background:
+    linear-gradient(135deg, rgba(255, 255, 255, 0.68), var(--detail-surface)),
+    var(--detail-surface);
+  border-color: color-mix(in srgb, var(--detail-accent) 25%, white);
 }
 
 .service-grid + .service-detail {
   margin-top: 22px;
+}
+
+.service-detail[data-active-service="cleanup"] {
+  --detail-accent: #16a779;
+  --detail-surface: #edf9f4;
+}
+
+.service-detail[data-active-service="dashboard"] {
+  --detail-accent: #1f66d1;
+  --detail-surface: #edf5ff;
+}
+
+.service-detail[data-active-service="reporting"] {
+  --detail-accent: #6756e8;
+  --detail-surface: #f2efff;
+}
+
+.service-detail[data-active-service="volunteer"] {
+  --detail-accent: #f06f70;
+  --detail-surface: #fff1ee;
 }
 
 .service-detail h3 {
@@ -852,8 +909,8 @@ em {
   display: grid;
   place-items: center;
   border-radius: 50%;
-  background: #e8f7f1;
-  color: var(--green);
+  background: color-mix(in srgb, var(--detail-accent) 12%, white);
+  color: var(--detail-accent);
   font-size: 0.78rem;
 }
 

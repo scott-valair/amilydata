@@ -115,42 +115,42 @@
         </div>
 
         <div class="service-grid">
-          <button class="service-card reveal active" type="button" data-service="cleanup">
+          <button class="service-card reveal active" type="button" data-service="cleanup" aria-expanded="true">
             <span class="icon icon-green" aria-hidden="true">X</span>
             <h3>Spreadsheet Cleanup</h3>
             <p>Fix messy files, duplicates, formats, formulas, and confusing tabs.</p>
-            <span class="card-arrow">↓</span>
+            <span class="card-arrow" aria-hidden="true">−</span>
           </button>
 
-          <button class="service-card reveal delay-1" type="button" data-service="dashboard">
+          <button class="service-card reveal delay-1" type="button" data-service="dashboard" aria-expanded="false">
             <span class="icon icon-blue" aria-hidden="true">
               <svg viewBox="0 0 24 24"><path d="M4 19V5m0 14h17M8 16V9m5 7V6m5 10v-4"/></svg>
             </span>
             <h3>Dashboard Design</h3>
             <p>Turn raw numbers into simple visuals that are easier to act on.</p>
-            <span class="card-arrow">↓</span>
+            <span class="card-arrow" aria-hidden="true">+</span>
           </button>
 
-          <button class="service-card reveal delay-2" type="button" data-service="reporting">
+          <button class="service-card reveal delay-2" type="button" data-service="reporting" aria-expanded="false">
             <span class="icon icon-purple" aria-hidden="true">
               <svg viewBox="0 0 24 24"><path d="M7 3h7l5 5v13H7zM14 3v6h5M10 13h6M10 17h6"/></svg>
             </span>
             <h3>Reporting Support</h3>
             <p>Create clear reports for leadership, donors, clients, or your team.</p>
-            <span class="card-arrow">↓</span>
+            <span class="card-arrow" aria-hidden="true">+</span>
           </button>
 
-          <button class="service-card reveal delay-3" type="button" data-service="volunteer">
+          <button class="service-card reveal delay-3" type="button" data-service="volunteer" aria-expanded="false">
             <span class="icon icon-coral" aria-hidden="true">
               <svg viewBox="0 0 24 24"><path d="M12 20s-7-4.35-9.2-8.25C1.1 8.7 2.7 5 6.1 5c2 0 3.2 1.1 3.9 2.1C10.8 6.1 12 5 13.9 5c3.4 0 5 3.7 3.3 6.75C15 15.65 12 20 12 20Z"/></svg>
             </span>
             <h3>Volunteer / Low-Cost Projects</h3>
             <p>Discounted or pro bono support for qualified community organizations.</p>
-            <span class="card-arrow">↓</span>
+            <span class="card-arrow" aria-hidden="true">+</span>
           </button>
         </div>
 
-        <aside class="service-detail reveal" aria-live="polite" data-service-detail>
+        <aside class="service-detail reveal" aria-live="polite" data-service-detail data-active-service="cleanup">
           <div>
             <p class="eyebrow">Selected service</p>
             <h3 data-detail-title>Spreadsheet Cleanup</h3>
