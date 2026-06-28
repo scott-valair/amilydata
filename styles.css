@@ -802,13 +802,18 @@ em {
 }
 
 .service-detail {
-  margin-top: 22px;
+  grid-column: 1 / -1;
+  margin-top: 0;
   border-radius: 24px;
   padding: 28px;
   display: grid;
   grid-template-columns: 1.3fr 1fr;
   gap: 28px;
   align-items: center;
+}
+
+.service-grid + .service-detail {
+  margin-top: 22px;
 }
 
 .service-detail h3 {

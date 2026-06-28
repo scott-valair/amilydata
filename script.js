@@ -138,10 +138,34 @@ if ("ResizeObserver" in window) {
 }
 
 const serviceButtons = [...document.querySelectorAll("[data-service]")];
+const serviceGrid = document.querySelector(".service-grid");
 const detail = document.querySelector("[data-service-detail]");
 const detailTitle = document.querySelector("[data-detail-title]");
 const detailCopy = document.querySelector("[data-detail-copy]");
 const detailList = document.querySelector("[data-detail-list]");
+
+function getServiceColumnCount() {
+  if (!serviceGrid) return 1;
+  const columns = getComputedStyle(serviceGrid).gridTemplateColumns
+    .split(" ")
+    .filter((column) => column && column !== "none");
+  return Math.max(1, columns.length);
+}
+
+function positionServiceDetail(activeButton = document.querySelector(".service-card.active")) {
+  if (!serviceGrid || !detail || !activeButton) return;
+  const activeIndex = serviceButtons.indexOf(activeButton);
+  if (activeIndex < 0) return;
+
+  const columns = Math.min(getServiceColumnCount(), serviceButtons.length);
+  const rowEndIndex = Math.min(
+    serviceButtons.length - 1,
+    Math.floor(activeIndex / columns) * columns + columns - 1
+  );
+  serviceButtons[rowEndIndex].after(detail);
+}
+
+positionServiceDetail();
 
 serviceButtons.forEach((button) => {
   button.addEventListener("click", () => {
@@ -151,6 +175,7 @@ serviceButtons.forEach((button) => {
 
     serviceButtons.forEach((item) => item.classList.remove("active"));
     button.classList.add("active");
+    positionServiceDetail(button);
 
     detail?.animate([
       { opacity: 0.55, transform: "translateY(10px)" },
@@ -165,6 +190,12 @@ serviceButtons.forEach((button) => {
       return listItem;
     }));
   });
+});
+
+let serviceDetailResizeFrame;
+window.addEventListener("resize", () => {
+  cancelAnimationFrame(serviceDetailResizeFrame);
+  serviceDetailResizeFrame = requestAnimationFrame(() => positionServiceDetail());
 });
 
 function randomLinePoints(width = 330, height = 120, points = 11) {
