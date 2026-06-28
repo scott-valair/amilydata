@@ -796,7 +796,7 @@ em {
 
 .service-card:hover .card-arrow,
 .service-card.active .card-arrow {
-  transform: translateX(3px);
+  transform: translateY(3px);
   background: var(--blue);
   color: white;
 }
